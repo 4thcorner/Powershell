@@ -1,11 +1,12 @@
 ﻿<#
  Solution: Hyper-V 
  Purpose: Hyper-V GUI
- Version: 1.0
-    Date: 26 May 2016
+ Version: 2.0.0
+    Date: 22 June 2020 
+
   Author: Tomas Johansson
- Twitter: @CanKlant
-    Blog: http://www.4thcorner.se
+ Twitter: @Deploymentdude
+     WWW: www.4thcorner.net
 
  This script is provided "AS IS" with no warranties, confers no rights and 
  is not supported by the author
