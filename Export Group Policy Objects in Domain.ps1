@@ -1,22 +1,33 @@
 ﻿<#
-Solution: Hydration System Center 2012 R2 
- Purpose: Export selected GPO´s with GUI Dialog
+Solution: Microsoft Deployment Toolkit
+ Purpose: Group Policys Export GUI
  Version: 2.0.0
-    Date: 22 June 2020 
+    Date: 20 July 2020
 
   Author: Tomas Johansson
- Twitter: @Deploymentdude
-     WWW: www.4thcorner.net
+ Twitter: @deploymentnoob
+     Web: https://www.4thcorner.net
 
- This script is provided "AS IS" with no warranties, confers no rights and 
- is not supported by the author
+This script is provided "AS IS" with no warranties, confers no rights and 
+is not supported by the author
 #>
+
 #Add WPF and Windows Forms assemblies
 try {
-    Add-Type -AssemblyName PresentationCore,PresentationFramework,WindowsBase,system.windows.forms
+    Add-Type -AssemblyName PresentationCore
+    Add-Type -AssemblyName PresentationFramework
+    Add-Type -AssemblyName system.windows.forms
 }
 catch {
     Throw "Failed to load Windows Presentation Framework assemblies."
+}
+
+# Check for elevation
+If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(`
+    [Security.Principal.WindowsBuiltInRole] "Administrator"))
+{
+    [System.Windows.MessageBox]::Show("Oupps!`nYou need to run this Script from an Elevated PowerShell!`nPlease start the PowerShell as an Administrator`nAborting script...",'Group Policys Export','OK',[System.Windows.Forms.MessageBoxIcon]::Warning)
+    Break
 }
 
 # Export Dialog
@@ -58,8 +69,8 @@ foreach ($Name in ($XAML | Select-Xml '//*/@Name' | foreach { $_.Node.Value})) {
 }
 
 # Constants
-$GPOtoExport = @()
-$GPOList =  @()
+#$GPOtoExport = @()
+#$GPOList =  @()
 
 # Get Doamin
 $Domain = (Get-ADDomain).DNSRoot
@@ -74,19 +85,24 @@ $Path = split-path -parent $MyInvocation.MyCommand.Path
 $InitialDirectory = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
 
 # Set Deafult export path
-$ExportPath = $Path
+$Global:ExportPath = $Null
 
 # Show an Open Folder Dialog and return the directory selected by the user.
-function Read-FolderBrowserDialog([string]$Message, [string]$InitialDirectory, [switch]$NoNewFolderButton)
-{
-    $browseForFolderOptions = 0
-    if ($NoNewFolderButton) { $browseForFolderOptions += 512 }
- 
-    $app = New-Object -ComObject Shell.Application
-    $folder = $app.BrowseForFolder(0, $Message, $browseForFolderOptions, $InitialDirectory)
-    if ($folder) { $selectedDirectory = $folder.Self.Path } else { $selectedDirectory = '' }
-    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($app) > $null
-    return $selectedDirectory
+Function Read-FolderBrowserDialog([string]$Message, [string]$InitialDirectory, [switch]$NoNewFolderButton) {
+    $BrowseForFolderOptions = 0
+    If ($NoNewFolderButton) {
+        $BrowseForFolderOptions += 512
+    }
+    $App = New-Object -ComObject Shell.Application
+    $Folder = $App.BrowseForFolder(0, $Message, $browseForFolderOptions, $InitialDirectory)
+    If ($Folder) {
+        $selectedDirectory = $Folder.Self.Path
+    }
+    Else {
+        $selectedDirectory = $Null
+    }
+    [System.Runtime.Interopservices.Marshal]::ReleaseComObject($App) > $null
+    Return $selectedDirectory
 }
 
 # Export Selected Group Policys to selected folder
@@ -109,8 +125,7 @@ Function ExportSelectedGPO ([string]$ExportPath,[Array]$GPOtoExport )
             }
              
             # Backup pf GPO
-            Backup-GPO -Name $GPOName -Path $GPONamePath -ErrorAction Ignore | Out-Null
-            #Write-Host -ForegroundColor Green "GPO: $GPOName exist in domain and backup is done to $GPONamePath"
+            Backup-GPO -Name $GPOName -Path $GPONamePath -ErrorAction SilentlyContinue | Out-Null
         }
         Catch {
             [System.Windows.Forms.MessageBox]::Show("Error exporting" , "Errors")
@@ -119,10 +134,11 @@ Function ExportSelectedGPO ([string]$ExportPath,[Array]$GPOtoExport )
     }
 }
 
-#EVENT Handler
-
 # GPO Listbox content
 $GPOlistBox.ItemsSource = $GPOList
+
+# Selectionmode for ListBox
+$GPOlistBox.SelectionMode = 'Multiple'
 
 # Textbox with Path
 $ExporttextBox.Text = $Path
@@ -141,12 +157,15 @@ $BrowseButton.add_Click({
 })
 
 $OKButton.add_Click({
-    $Global:GPOToExport = $GPOlistBox.SelectedItems
-    if ([string]::IsNullOrEmpty($GPOtoExport)) { 
+    
+    $GPOtoExport = $GPOlistBox.SelectedItems
+
+    If ([string]::IsNullOrEmpty($GPOtoExport)) { 
         [System.Windows.Forms.MessageBox]::Show("No Group Policys Selected!" , "Group Policys")
     }
     Else {
         ExportSelectedGPO -ExportPath $ExportPath -GPOtoExport $GPOToExport
+        $Window.Close()
         $ButtonType = [System.Windows.MessageBoxButton]::OK
         $MessageboxTitle = “Group Policys Exported”
         $Messageboxbody = “Selected Group Policys exported"
@@ -158,13 +177,13 @@ $OKButton.add_Click({
 })
 
 # Close dialog window
-$CancelButton.add_click({ 
+$CancelButton.add_click({
     $Window.Close() 
 }) 
 
-#Launch the window
+# Launch the window
 $Window.WindowStartupLocation="CenterScreen"
-$Window.Add_Loaded( {
+$Window.Add_Loaded({
     $this.TopMost = $true
 })
 $Window.ShowDialog() | Out-Null
