@@ -19,7 +19,7 @@ $ComputerInfo = ([ordered]@{
     ServerOS = $ServerOS
     Version = $Version
     Installed = $InstallDate
-    'Last Boot' = $Boot
+    #'Last Boot' = $Boot
 })
 
 # Get Screen Resolution 
@@ -33,7 +33,7 @@ $WallPaperColorHex = "#003C50"
 # Font Settings
 # Fonts must be installed on the computer 
 $FontName = "Forsvarsmakten Sans Stencil"
-$FontSize = 15
+$FontSize = 16
 $FontStyle = [System.Drawing.FontStyle]::Regular
 $FontUnit = [System.Drawing.GraphicsUnit]::Point
 $FontColor = "White"
@@ -161,7 +161,7 @@ If ($ShowDiskInfo -eq $True ) {
     }
 }
 
-$TextBgWidth = $MaxKeyWidth + $MaxValueWidth + $TextPaddingLeft + $textPaddingRight
+$TextBgWidth = $MaxKeyWidth + $MaxValueWidth + $textPaddingRight
 $TextBgX = $Resolution.Width - $TextBgWidth - $MarginRight
 $textBgY = $Resolution.Height - $TextBgHeight - $MarginBottom - $TaskbarOffset
 
@@ -246,3 +246,26 @@ $Graphics.Dispose()
 # Save and close Bitmap
 $Background.Save($SaveFile, [system.drawing.imaging.imageformat]::$SaveImageType)
 $Background.Dispose()
+
+
+# Modify Path to the picture accordingly to reflect your infrastructure
+$ImgPath = $SaveFile
+$Code = @' 
+using System.Runtime.InteropServices; 
+namespace Win32{ 
+    
+     public class Wallpaper{ 
+        [DllImport("user32.dll", CharSet=CharSet.Auto)] 
+         static extern int SystemParametersInfo (int uAction , int uParam , string lpvParam , int fuWinIni) ; 
+         
+         public static void SetWallpaper(string thePath){ 
+            SystemParametersInfo(20,0,thePath,3); 
+         }
+    }
+ } 
+'@
+
+add-type $code 
+
+#Apply the Change on the system 
+[Win32.Wallpaper]::SetWallpaper($imgPath)
