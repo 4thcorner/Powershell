@@ -8,10 +8,10 @@ A script for managing guests on the hyper-v host.
 
 ## Server
 
-### ExportGroupPolicyObjectsinDomain.ps1
+### Export-GroupPolicyObjectsinDomain.ps1
 Export Group Policy Objects in Domain
 
-### ExportWMIFiltersinDomain.ps1
+### Export-WMIFiltersinDomain.ps1
 Export GPO WMI Filters in Domain 
 
 ### GenerateDesktopBackground.ps1
