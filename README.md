@@ -15,6 +15,6 @@ Export Group Policy Objects in Domain
 Export GPO WMI Filters in Domain 
 
 ### GenerateDesktopBackground.ps1
-Genereta Desktop Backrond.  
+Genereta Desktop Backgrond.  
 Detects Resolution  
-If you want to showe Disks information set variable ShowDiskInfo to True
+If you want to show disks information set variable ShowDiskInfo to True
