@@ -112,7 +112,7 @@ $VMs = get-vm
     $ListViewMain.ItemsSource = $VMInfos
 }
 
-#Event Handlers
+# Event Handlers
 $Form.Add_Loaded({
 
 })
