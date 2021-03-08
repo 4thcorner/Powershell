@@ -353,6 +353,9 @@ Function DoDeleteofVM {
     }
 }
 
+# Set Lable Machine Content
+$Machine.Content = $env:COMPUTERNAME
+
 # Load Listview with data
 LoadListView
 
