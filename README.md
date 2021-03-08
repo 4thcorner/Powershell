@@ -18,3 +18,11 @@ Export GPO WMI Filters in Domain
 Genereta Desktop Backgrond.  
 Detects Resolution  
 If you want to show disks information set variable ShowDiskInfo to True
+
+## Tools
+
+### Manage Key and Passwords.ps1
+Generate or use key to obfuscate string
+
+### ObfuscateStringGUI.ps1
+Same as above but still under development. Not working!
