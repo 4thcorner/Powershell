@@ -1,8 +1,8 @@
 ﻿<#
  Solution: Hyper-V 
  Purpose: Hyper-V GUI
- Version: 2.0.0
-    Date: 22 June 2020 
+ Version: 2.0.1
+    Date: 08 Mars 2021 
 
   Author: Tomas Johansson
  Twitter: @Deploymentdude
@@ -20,7 +20,7 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     Break
 }
 
-#Check hyper-v module installed
+# Check hyper-v module installed
 if(!(get-module -ListAvailable -Name "hyper-v")) {
     throw "Hyper-V module not found. Please run this tool on a server that has the Hyper-V management tools installed"
 }
@@ -85,17 +85,16 @@ Add-Type -AssemblyName System.Windows.Forms
 </Window>
 '@
 
-#Read XAML
+# Read XAML
 $Reader = New-Object System.Xml.XmlNodeReader $XAML
 $Form = [Windows.Markup.XamlReader]::Load($Reader)
 foreach ($Name in ($XAML | Select-Xml '//*/@Name' | ForEach-Object { $_.Node.Value})) {
     New-Variable -Name $Name -Value $Form.FindName($Name) -Force
 }
 
-
 Function LoadListView {
 $VMInfos = @()
-$VMs = get-vm #-ComputerName $ComputerName
+$VMs = get-vm
 
     foreach ($VM in $VMs) {
         $VMInfo = New-Object -TypeName PSObject
@@ -113,15 +112,12 @@ $VMs = get-vm #-ComputerName $ComputerName
     $ListViewMain.ItemsSource = $VMInfos
 }
 
-
-$Machine.Content = $env:COMPUTERNAME
-
 #Event Handlers
 $Form.Add_Loaded({
 
 })
 
-#Sort event handler
+# Sort event handler
 $Form.Add_SourceInitialized({
     [System.Windows.RoutedEventHandler]$ColumnSortHandler = {
 
@@ -146,7 +142,7 @@ $Form.Add_SourceInitialized({
             }
         }
     }
-    #Attach the Event Handler
+    # Attach the Event Handler
     $ListViewMain.AddHandler([System.Windows.Controls.GridViewColumnHeader]::ClickEvent, $ColumnSortHandler)
 })
 
@@ -214,7 +210,7 @@ $objForm.Add_KeyDown({
     }
 })
 
-#Actions
+# Action Stop Virtual Machines
 function Stop-VMs
 {
     [CmdletBinding()]
@@ -228,7 +224,8 @@ function Stop-VMs
                    Position=0)]
         [Object] $VM
     )
-
+    Begin {
+    }
     Process
     {
      write-warning "Shutting down VM: $($VM.VMName) ($($VM.Name))"
@@ -239,6 +236,7 @@ function Stop-VMs
     }
 }
 
+# Action Start Virtual Machines
 Function Start-VMs {
     [CmdletBinding()]
     [Alias()]
@@ -251,7 +249,8 @@ Function Start-VMs {
                    Position=0)]
         [Object] $VM
     )
-    
+    Begin {
+    }
     Process
     {
      write-warning "Starting VM: $($VM.VMName) "
@@ -275,6 +274,8 @@ Function Delete-VM {
                    Position=0)]
         [Object] $VM
     )
+    Begin {
+    }
     Process {
         write-warning "Deleting VM: $($VM.VMName) ($($VM.Name))"
         $VM2Delete  = $VM
@@ -311,6 +312,8 @@ Function DoDeleteofVM {
                    Position=0)]
         [String]$MachineName
     )
+    Begin {
+    }
     Process {
         Try {
         # Get VM information
@@ -350,10 +353,10 @@ Function DoDeleteofVM {
     }
 }
 
-#Load Listview with data
+# Load Listview with data
 LoadListView
 
-#Launch the window
+# Launch the window
 $Form.WindowStartupLocation="CenterScreen"
 $Form.Add_Loaded( {
     $this.TopMost = $true
