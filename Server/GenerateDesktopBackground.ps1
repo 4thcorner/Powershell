@@ -1,3 +1,17 @@
+<#
+Solution: Create Desktop Image
+ Purpose: Group Policys Export GUI
+ Version: 1.0.0
+    Date: 05 March 2021
+
+  Author: Tomas Johansson
+ Twitter: @deploymentnoob
+     Web: https://www.4thcorner.net
+
+This script is provided "AS IS" with no warranties, confers no rights and 
+is not supported by the author
+#>
+
 # Add Microsoft .NET Core class to PowerShell session
 Add-Type -AssemblyName System.Drawing
 Add-Type -AssemblyName System.Windows.Forms

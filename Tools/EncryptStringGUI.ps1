@@ -3,7 +3,7 @@
 Solution: Microsoft Deployment Toolkit
  Purpose: Encrypt Text GUI
  Version: 1.0.0
-    Date: 08 Mars 2021
+    Date: 08 March 2021
 
   Author: Tomas Johansson
  Twitter: @deploymentnoob
