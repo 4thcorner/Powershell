@@ -24,5 +24,5 @@ If you want to show disks information set variable ShowDiskInfo to True
 ### Manage Key and Passwords.ps1
 Generate or use key to obfuscate string
 
-### ObfuscateStringGUI.ps1
-Same as above but still under development. Not working!
+### EncryptStringGUI.ps1
+Same as above but use GUI. 

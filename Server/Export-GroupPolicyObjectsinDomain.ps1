@@ -2,7 +2,7 @@
 Solution: Microsoft Deployment Toolkit
  Purpose: Group Policys Export GUI
  Version: 3.0.0
-    Date: 05 Mars 2021
+    Date: 05 March 2021
 
   Author: Tomas Johansson
  Twitter: @deploymentnoob
