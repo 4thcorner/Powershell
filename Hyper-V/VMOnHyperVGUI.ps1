@@ -22,7 +22,12 @@ If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 # Check hyper-v module installed
 if(!(get-module -ListAvailable -Name "hyper-v")) {
-    throw "Hyper-V module not found. Please run this tool on a server that has the Hyper-V management tools installed"
+        $ButtonType = [System.Windows.MessageBoxButton]::OK
+        $MessageboxTitle = "Hyper-V module not found"
+        $Messageboxbody = "Please run this tool on a server that has the Hyper-V management tools installed"
+        $MessageIcon = [System.Windows.MessageBoxImage]::Exclamation
+        [System.Windows.MessageBox]::Show($Messageboxbody,$MessageboxTitle,$ButtonType,$messageicon)
+
 }
 
 # Add needed Assemblys

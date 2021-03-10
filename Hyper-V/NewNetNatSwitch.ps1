@@ -24,6 +24,27 @@ catch {
     Throw "Failed to load Windows Presentation Framework assemblies."
 }
 
+# Check for elevation
+If (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole( `
+    [Security.Principal.WindowsBuiltInRole] "Administrator")) {
+    $ButtonType = [System.Windows.MessageBoxButton]::OK
+    $MessageboxTitle = "Aborting script..."
+    $Messageboxbody = "Oupps, you need to run this script from an elevated PowerShell prompt! Please start the PowerShell prompt as an Administrator and re-run the script."
+    $MessageIcon = [System.Windows.MessageBoxImage]::Exclamation
+    [System.Windows.MessageBox]::Show($Messageboxbody,$MessageboxTitle,$ButtonType,$messageicon)
+    Exit
+}
+
+if(!(get-module -ListAvailable -Name "hyper-v")) {
+    $ButtonType = [System.Windows.MessageBoxButton]::OK
+    $MessageboxTitle = "Hyper-V module not found"
+    $Messageboxbody = "Please run this tool on a server that has the Hyper-V management tools installed"
+    $MessageIcon = [System.Windows.MessageBoxImage]::Exclamation
+    [System.Windows.MessageBox]::Show($Messageboxbody,$MessageboxTitle,$ButtonType,$messageicon)
+    Exit
+}
+
+
 # Export Dialog
 [xml]$XAML = @'
 <Window
@@ -70,9 +91,26 @@ ForEach-Object {
 }
 
 $SyncHash.TextBox_SwitchName.Add_TextChanged({
+    $NewswitchName = $SyncHash.TextBox_SwitchName.Text
+    $ExistName = Get-VMSwitch | Where-Object {$_.Name -like "*$NewswitchName*"} |Select-Object -ExpandProperty Name
+
+    If ([string]::IsNullOrEmpty($ExistName)) {
+        $SwitchExist = $False
+    }
+    Else {
+        $SwitchExist = $True
+    }
+
     $SyncHash.Window.Dispatcher.Invoke(
         [action]{
-            $SyncHash.Label_NewSwitchName_Result.Content = $SyncHash.TextBox_SwitchName.Text
+            If ($SwitchExist -eq $True) {
+                $SyncHash.Label_NewSwitchName_Result.Foreground = "Red"
+                $SyncHash.Label_NewSwitchName_Result.Content = "Switch with that name already exist!"
+            }
+            Else {
+                $SyncHash.Label_NewSwitchName_Result.Foreground = "Black"
+                $SyncHash.Label_NewSwitchName_Result.Content = $SyncHash.TextBox_SwitchName.Text
+            }
         }
     )
 })
@@ -89,8 +127,6 @@ $SyncHash.TextBox_PrefixLength.Add_TextChanged({
     }
     $ValidSubnet = Test-IPv4MaskString $SubnetMask
 
-
-
     $SyncHash.Window.Dispatcher.Invoke(
         [action]{
             $SyncHash.Label_InternalAdressPrefix_Result.Content = $SyncHash.TextBox_PrefixLength.Text
@@ -98,7 +134,6 @@ $SyncHash.TextBox_PrefixLength.Add_TextChanged({
             $SyncHash.Label_Slash.Visibility = 'Visible'
             If ($ValidSubnet -eq $true) {
                 $SyncHash.Label_InternalAdressPrefix_Result.Foreground = "Black"
-                
                 $SyncHash.Label_InternalAdressPrefix_Calculated.Foreground = "Black"
                 $SyncHash.Label_InternalAdressPrefix_Calculated.Content = $SubnetMask
             }
@@ -131,11 +166,12 @@ $SyncHash.TextBox_IPAdressGateway.Add_TextChanged({
 
 })
 
-
 # Close Dialog Window
 $SyncHash.button_cancel.add_click({
     $SyncHash.Window.Close() 
 })
+
+
 
 
 Function Test-GateWayIPAdress {
@@ -212,9 +248,10 @@ Function Test-IPv4MaskString {
     
         # Secondly, make sure it only contains numbers and it's between 0-255
         if ($bValidMask) {
-            #[reflection.assembly]::LoadWithPartialName("'Microsoft.VisualBasic") | Out-Null
             foreach ($item in $arrSections) {
-                if (!([Microsoft.VisualBasic.Information]::isnumeric($item))) {$bValidMask = $false}
+                if(!($item  -match "^\d+$")) {
+                   $bValidMask = $false
+                }                  
             }
         }
     
