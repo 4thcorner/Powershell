@@ -1,9 +1,9 @@
 
 <#
-Solution: Microsoft Deployment Toolkit
- Purpose: Encrypt Text GUI
- Version: 1.0.0
-    Date: 08 Mars 2021
+Solution: Microsoft Hyper-V Tool
+ Purpose: Create New Swicth with NetNat GUI
+ Version: 2.0.0
+    Date: 11 Mars 2021
 
   Author: Tomas Johansson
  Twitter: @deploymentnoob
@@ -18,7 +18,6 @@ try {
     Add-Type -AssemblyName PresentationCore -ErrorAction Stop
     Add-Type -AssemblyName PresentationFramework -ErrorAction Stop
     Add-Type -AssemblyName system.windows.forms -ErrorAction Stop
-    #Add-Type -AssemblyName Microsoft.VisualBasic
 }
 catch {
     Throw "Failed to load Windows Presentation Framework assemblies."
@@ -45,31 +44,32 @@ if(!(get-module -ListAvailable -Name "hyper-v")) {
 }
 
 
-# Export Dialog
+# Windows GUIin XAML
 [xml]$XAML = @'
 <Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="New Hyper-V NetNat Switch" Height="310" Width="450" Topmost="True" ResizeMode="NoResize">
-    <Grid Height="280" Width="450"  HorizontalAlignment="Left" Margin="0,0,-6,1">
+        Title="New Hyper-V NetNat Switch" Height="380" Width="450" Topmost="True" ResizeMode="NoResize">
+        <Grid Height="350" Width="450"  HorizontalAlignment="Left" Margin="0,-1,-6,2">
         <Label x:Name="Label_SwitchName" Content="Switch Name:" HorizontalAlignment="Left" Margin="20,15,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TextBox_SwitchName" HorizontalAlignment="Left" Height="23" Margin="25,37,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="300"/>
+        <TextBox x:Name="TextBox_SwitchName" HorizontalAlignment="Left" Height="23" Margin="25,37,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="300" TabIndex="0"/>
         <Label x:Name="Label_IPAdress_Gateway" Content="IP Adress of Gateway:" HorizontalAlignment="Left" Margin="20,59,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TextBox_IPAdressGateway" HorizontalAlignment="Left" Height="23" Margin="25,82,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="300"/>
-        <Label x:Name="Label_PrefixxLength" Content="PrefixLength" HorizontalAlignment="Left" Margin="20,103,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="TextBox_PrefixLength" HorizontalAlignment="Left" Height="23" Margin="25,127,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50"/>
+        <TextBox x:Name="TextBox_IPAdressGateway" HorizontalAlignment="Left" Height="23" Margin="25,82,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="300" TabIndex="1"/>
+        <Label x:Name="Label_PrefixxLength" Content="Prefix:" HorizontalAlignment="Left" Margin="20,103,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="TextBox_PrefixLength" HorizontalAlignment="Left" Height="23" Margin="25,127,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="50" TabIndex="2"/>
         <Label x:Name="Label_NewSwitchName" Content="Switch Name:" HorizontalAlignment="Left" Margin="76,160,0,0" VerticalAlignment="Top"/>
         <Label x:Name="Label_NewSwitchName_Result" Content="" HorizontalAlignment="Left" Margin="155,160,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Label_Gateway_IPAdress" Content="Gateway IP Address:" HorizontalAlignment="Left" Margin="42,200,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Label_Gateway_IPAddress_Result" Content="" HorizontalAlignment="Left" Margin="155,201,0,0" VerticalAlignment="Top"/>
         <Label x:Name="Label_Network" Content="Network:" HorizontalAlignment="Left" Margin="100,180,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="Label_IPAddressSpace" Content="" HorizontalAlignment="Left" Margin="160,180,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="Label_Slash" Content="/" HorizontalAlignment="Left" Margin="235,180,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
-        <Label x:Name="Label_InternalAdressPrefix_Result_2" Content="" HorizontalAlignment="Left" Margin="240,180,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="Label_InternalAdressPrefix" Content="Internal IP Adress Prefix:" HorizontalAlignment="Left" Margin="21,200,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="Label_InternalAdressPrefix_Result" Content="" HorizontalAlignment="Left" Margin="155,200,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="Label_Subnetmask" Content="Subnetmask:" HorizontalAlignment="Left" Margin="200,200,0,0" VerticalAlignment="Top"/>        
-        <Label x:Name="Label_InternalAdressPrefix_Calculated" Content="" HorizontalAlignment="Left" Margin="270,200,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="Button_CreateNetNat" Content="Create" HorizontalAlignment="Left" Margin="260,241,0,0" VerticalAlignment="Top" Width="75"/>
-        <Button x:Name="Button_Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="350,240,0,0" VerticalAlignment="Top" Width="75"/>
+        <Label x:Name="Label_IPAddressSpace" Content="" HorizontalAlignment="Left" Margin="155,180,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Label_InternalAdressPrefix" Content="Internal IP Adress Prefix:" HorizontalAlignment="Left" Margin="21,220,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Label_InternalAdressPrefix_Result" Content="" HorizontalAlignment="Left" Margin="155,220,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Label_Subnetmask" Content="Subnetmask:" HorizontalAlignment="Left" Margin="81,240,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Label_InternalAdressPrefix_Calculated" Content="" HorizontalAlignment="Left" Margin="156,240,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="Label_Create_Information" Content="" HorizontalAlignment="Center" Margin="20,279,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="Button_CreateNetNat" Content="Create" HorizontalAlignment="Left" Margin="260,320,0,0" VerticalAlignment="Top" Width="75" TabIndex="3"/>
+        <Button x:Name="Button_Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="350,320,0,0" VerticalAlignment="Top" Width="75" TabIndex="4"/>
     </Grid>
 </Window>
 '@
@@ -92,8 +92,8 @@ ForEach-Object {
 
 $SyncHash.TextBox_SwitchName.Add_TextChanged({
     $NewswitchName = $SyncHash.TextBox_SwitchName.Text
-    $ExistName = Get-VMSwitch | Where-Object {$_.Name -like "*$NewswitchName*"} |Select-Object -ExpandProperty Name
-
+    $ExistName = Get-VMSwitch | Where-Object {$_.Name -like "$NewswitchName"} | Select-Object -ExpandProperty Name
+    
     If ([string]::IsNullOrEmpty($ExistName)) {
         $SwitchExist = $False
     }
@@ -106,10 +106,12 @@ $SyncHash.TextBox_SwitchName.Add_TextChanged({
             If ($SwitchExist -eq $True) {
                 $SyncHash.Label_NewSwitchName_Result.Foreground = "Red"
                 $SyncHash.Label_NewSwitchName_Result.Content = "Switch with that name already exist!"
+                $SyncHash.Button_CreateNetNat.IsEnabled = $False
             }
             Else {
                 $SyncHash.Label_NewSwitchName_Result.Foreground = "Black"
                 $SyncHash.Label_NewSwitchName_Result.Content = $SyncHash.TextBox_SwitchName.Text
+                $SyncHash.Button_CreateNetNat.IsEnabled = $True
             }
         }
     )
@@ -130,17 +132,17 @@ $SyncHash.TextBox_PrefixLength.Add_TextChanged({
     $SyncHash.Window.Dispatcher.Invoke(
         [action]{
             $SyncHash.Label_InternalAdressPrefix_Result.Content = $SyncHash.TextBox_PrefixLength.Text
-            $SyncHash.Label_InternalAdressPrefix_Result_2.Content = $SyncHash.TextBox_PrefixLength.Text
-            $SyncHash.Label_Slash.Visibility = 'Visible'
             If ($ValidSubnet -eq $true) {
                 $SyncHash.Label_InternalAdressPrefix_Result.Foreground = "Black"
                 $SyncHash.Label_InternalAdressPrefix_Calculated.Foreground = "Black"
                 $SyncHash.Label_InternalAdressPrefix_Calculated.Content = $SubnetMask
+                $SyncHash.Button_CreateNetNat.IsEnabled = $True
             }
             Else {
                 $SyncHash.Label_InternalAdressPrefix_Result.Foreground = "Red"
                 $SyncHash.Label_InternalAdressPrefix_Calculated.Foreground = "Red"
                 $SyncHash.Label_InternalAdressPrefix_Calculated.Content = "Not Valid subnetmask"
+                $SyncHash.Button_CreateNetNat.IsEnabled = $False
             }
         }
     )
@@ -152,25 +154,196 @@ $SyncHash.TextBox_IPAdressGateway.Add_TextChanged({
     $VaildIPAdress = Test-GateWayIPAdress $GWIPAddress
 
     If ($VaildIPAdress -eq $true) {
-        $IPAddressSpace = Resolve-IPv4NetworkSpace $GWIPAddress
+        $GatewayIPExist = Test-NetIPAdress $GWIPAddress
+        If ($GatewayIPExist -eq $False) {
+            $IPAddressSpace = Resolve-IPv4NetworkSpace $GWIPAddress
+            $SyncHash.Label_Gateway_IPAddress_Result.Foreground = "Black"
+            $ResultIPAdress = $GWIPAddress
+        }
+        Else {
+            $SyncHash.Label_Gateway_IPAddress_Result.Foreground = "Red"
+            $ResultIPAdress = "IP Adress already exist!"
+            $IPAddressSpace = "-"
+        }
     }
 
     $SyncHash.Window.Dispatcher.Invoke(
         [action]{
             If ($VaildIPAdress -eq $true) {
+                $SyncHash.Label_Gateway_IPAddress_Result.Content = $ResultIPAdress
                 $SyncHash.Label_IPAddressSpace.Content = $IPAddressSpace
-
+                $SyncHash.Button_CreateNetNat.IsEnabled = $True
+            }
+            Else {
+                $SyncHash.Label_Gateway_IPAddress_Result.Content = $ResultIPAdress
+                $SyncHash.Button_CreateNetNat.IsEnabled = $False
+            }
+            If ($GatewayIPExist -eq $True) {
+                $SyncHash.Button_CreateNetNat.IsEnabled = $False
             }
         }
     )
-
 })
+
 
 # Close Dialog Window
 $SyncHash.button_cancel.add_click({
     $SyncHash.Window.Close() 
 })
 
+
+# Creat NetNat switch
+$SyncHash.Button_CreateNetNat.add_click({
+    $SwitchName = $SyncHash.TextBox_SwitchName.text
+    $NetworkGatewayIPAddress = $SyncHash.TextBox_IPAdressGateway.Text
+    $NetworkPrefix = $SyncHash.TextBox_PrefixLength.Text
+
+    # Network Adress Space
+    $NetworkIPAddressSpace = Resolve-IPv4NetworkSpace $NetworkGatewayIPAddress
+
+    # Check if NetNat already exist
+    $NetNatExist = Test-NetNat $NetworkIPAddressSpace $NetworkPrefix
+
+    If ($NetNatExist -eq $False) {
+        # Create 
+        $NetNatCreated = New-NetNatNetwork -SwitchName $SwitchName -GatewayIPAddress $NetworkGatewayIPAddress -IPAddressSpace $NetworkIPAddressSpace -PrefixLengt $NetworkPrefix
+
+        If ($NetNatCreated -eq $True) {
+            $SyncHash.Label_Create_Information.Foreground = "Black"
+            $ResultText = "NetNat created for switch: " + $SwitchName
+        }
+        Else {
+            $SyncHash.Label_Create_Information.Foreground = "Red"
+            $ResultText = "Failed to Create NetNat for switch: " + $SwitchName
+        }
+    }
+    Else {
+        $ResultText = "NetNat: " + $NetNatExist + " Exist already"
+    }
+
+    $SyncHash.Window.Dispatcher.Invoke(
+        [action]{
+            $SyncHash.Label_Create_Information.Content = $ResultText
+        }
+    )
+})
+
+
+Function New-NetNatNetwork {
+    Param (
+        [string]$SwitchName,
+        [string]$GatewayIPAddress,
+        [string]$IPAddressSpace,
+        [byte]$PrefixLengt
+    )
+    BEGIN {
+        $Retval = $Null
+        $NetNatName = $SwitchName + "-Network"
+        $InterfaceAddressPrefix = $IPAddressSpace + "/" + $PrefixLengt
+    }
+    PROCESS {
+        Try {
+            $Retval = (New-VMSwitch -SwitchName $SwitchName -SwitchType Internal -ErrorAction Stop).Name
+            If (!([string]::IsNullOrEmpty($Retval))) {
+                Try {
+                    $InterfaceIndex = $Null
+                    $InterfaceIndex = (Get-NetAdapter | Where-Object {$_.Name -Like "vEthernet ($SwitchName)"}).InterfaceIndex
+                    If (!([string]::IsNullOrEmpty($InterfaceIndex))) {
+                        Try {
+                            $Retval = $Null
+                            $Retval = (New-NetIPAddress -IPAddress $GatewayIPAddress -PrefixLength $PrefixLengt -InterfaceIndex $InterfaceIndex -ErrorAction Stop).Count
+                            If (!([string]::IsNullOrEmpty($Retval))) {
+                                Try {
+                                    $Retval = $Null
+                                    Try {
+                                        $Null = New-NetNat -Name $NetNatName -InternalIPInterfaceAddressPrefix $InterfaceAddressPrefix -ErrorAction Stop
+                                        $Result = $True
+                                    }
+                                    Catch {
+                                        $Result = $False
+                                    }
+                                }
+                                Catch {
+                                    $Result = $False
+                                }
+                            }
+                            Else {
+                                $Result = $False 
+                            }
+                        }
+                        Catch {
+                            $Result = $False
+                        }
+                    }
+                    Else {
+                        $Result = $False
+                    }
+                }
+                Catch {
+                    $Result = $False
+                }   
+            }
+            Else {
+                $Result = $False
+            }
+        }
+        Catch {
+            $Result = $False
+        }
+    }
+    END {
+        Return $Result
+    }
+}
+
+Function Test-NetNat {
+    Param (
+        [String]$NetworkSpace,
+        [string]$NetworkPrefix
+    )
+    BEGIN{
+        $Retval = $Null
+        $InternalIPInterfaceAddressPrefix = $NetworkSpace + "/" + $NetworkPrefix
+    }
+    PROCESS{
+        Try {
+            $Retval = Get-NetNat | Where-Object {$_.InternalIPInterfaceAddressPrefix -match $InternalIPInterfaceAddressPrefix} | Select-Object -ExpandProperty Name -ErrorAction Stop
+            If(!([string]::IsNullOrEmpty($Retval))) {
+                $Retval = $True
+            
+            }
+            Else {
+                $Retval = $False
+            }
+        }
+        Catch {
+            $Retval = $False
+        }
+    }
+    END{
+        Return $Retval
+    }
+}
+
+Function Test-NetIPAdress {
+    Param (
+        [string]$GatewayIPAddress
+    )
+    BEGIN {
+    }
+    PROCESS {
+        Try {
+            $Null = Get-NetIPAddress -IPAddress $GatewayIPAddress -ErrorAction Stop
+            $Retval = $true 
+        }
+        Catch {
+            $Retval = $False
+        }
+    }
+    END {
+        Return $Retval
+    }
+}
 
 
 
@@ -243,14 +416,14 @@ Function Test-IPv4MaskString {
         
         # Firstly, make sure there are 4 sections in the subnet mask
         if ($ArrSections.count -ne 4) {
-            $bValidMask =$false
+            $bValidMask =$False
         }
     
         # Secondly, make sure it only contains numbers and it's between 0-255
         if ($bValidMask) {
             foreach ($item in $arrSections) {
                 if(!($item  -match "^\d+$")) {
-                   $bValidMask = $false
+                   $bValidMask = $False
                 }                  
             }
         }
@@ -259,7 +432,7 @@ Function Test-IPv4MaskString {
             foreach ($item in $arrSections)
             {
                 $item = [int]$item
-                if ($item -lt 0 -or $item -gt 255) {$bValidMask = $false}
+                if ($item -lt 0 -or $item -gt 255) {$bValidMask = $False}
             }
         }
     
@@ -276,11 +449,11 @@ Function Test-IPv4MaskString {
                 }
                 $strFullBinary = $strFullBinary+$binary
             }
-            if ($strFullBinary.contains("01")) {$bValidMask = $false}
+            if ($strFullBinary.contains("01")) {$bValidMask = $False}
             if ($bValidMask)
             {
                 $strFullBinary = $strFullBinary.replace("10", "1.0")
-                if ((($strFullBinary.split(".")).count -ne 2)) {$bValidMask = $false}
+                if ((($strFullBinary.split(".")).count -ne 2)) {$bValidMask = $False}
             }
         }
     }
@@ -309,7 +482,7 @@ Function Test-Bitmask {
     BEGIN {
     }
     PROCESS {
-        If (!($Bitmask -gt 32)) {
+        If ($Bitmask -lt 32) {
             $Retval = $true
             }
         Else {
@@ -357,5 +530,12 @@ $SyncHash.Window.WindowStartupLocation="CenterScreen"
 $SyncHash.Window.Add_Loaded( {
     $this.TopMost = $true
 })
+
+# Set Focus on first textbox
+$SyncHash.TextBox_SwitchName.Focus() | out-null
+
+# Disable Create NetNat button
+$SyncHash.Button_CreateNetNat.IsEnabled = $False
+
 # Show the window
 $SyncHash.Window.ShowDialog() | out-null
