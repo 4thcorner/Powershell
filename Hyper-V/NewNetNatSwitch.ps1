@@ -2,8 +2,8 @@
 <#
 Solution: Microsoft Hyper-V Tool
  Purpose: Create New Swicth with NetNat GUI
- Version: 2.0.0
-    Date: 11 Mars 2021
+ Version: 2.0.1
+    Date: 12 Mars 2021
 
   Author: Tomas Johansson
  Twitter: @deploymentnoob
@@ -180,6 +180,9 @@ $SyncHash.TextBox_IPAdressGateway.Add_TextChanged({
             }
             If ($GatewayIPExist -eq $True) {
                 $SyncHash.Button_CreateNetNat.IsEnabled = $False
+            }
+            Else {
+                $SyncHash.Button_CreateNetNat.IsEnabled = $True
             }
         }
     )
