@@ -4,7 +4,7 @@
 Script for Hyper-V host and Guests
 
 ### NewNetNatSwitch.ps1
-Create new NEtNat switch with gui
+Create new NetNat switch with gui
 
 ### VMOnHyperVGUI.ps1
 A GUI script for managing guests on the hyper-v host.
