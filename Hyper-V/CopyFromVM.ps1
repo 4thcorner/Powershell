@@ -2,7 +2,7 @@
 Solution: Microsoft Hyper-V Tool
  Purpose: Copy from Hyper-V Guest
  Version: 2.0.0
-    Date: 12 Mars 2021
+    Date: 12 March 2021
 
   Author: Tomas Johansson
  Twitter: @deploymentnoob
