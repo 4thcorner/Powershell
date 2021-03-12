@@ -3,6 +3,10 @@
 ## Hyper-V
 Script for Hyper-V host and Guests
 
+### CopyFromVM.ps1
+Copy Files from Hyper-V Guest to Host. 
+Using PSSSession to connect to Guest and copy files.
+
 ### NewNetNatSwitch.ps1
 Create new NetNat switch with gui
 
